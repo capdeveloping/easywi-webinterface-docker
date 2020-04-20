@@ -1,0 +1,23 @@
+version: "2"
+services:
+  db:
+    container_name: mysql
+    restart: always
+    image: mysql:latest
+    volumes:
+      - "/path/to/host/folder/:/var/lib/mysql"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+    command: mysqld --default-authentication-plugin=mysql_native_password --sql_mode="NO_ENGINE_SUBSTITUTION"
+
+  easywi:
+    image: easywi-webpanel:latest
+    container_name: easywi
+	links:
+      - db:db
+    ports:
+      - 80:80
+    restart: unless-stopped
+    volumes:
+      - "/path/to/host/folder/:/home/easywi_web/htdocs/"
+
