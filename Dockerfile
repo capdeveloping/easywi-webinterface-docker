@@ -47,6 +47,7 @@ ADD ./cronfile  /etc/cron.d/easywi
 ADD ./entrypoint.sh /etc/entrypoint.sh
 
 RUN useradd -md /home/easywi_web -g $WEBGROUPNAME -s /bin/bash -k /home/$MASTERUSER/skel/ easywi_web \
+    && mv /home/easywi_web/sessions /home/easywi_web/session \
     && find /home/easywi_web/ -type f -exec chmod 0640 {} \; \
     && find /home/easywi_web/ -mindepth 1 -type d -exec chmod 0750 {} \; \
     && chown -cR easywi_web:$WEBGROUPNAME /home/easywi_web >/dev/null 2>&1
