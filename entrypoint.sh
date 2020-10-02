@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 if [ -z "$(find "home/easywi_web/htdocs/" -maxdepth 1 -type f -exec echo Found {} \;)" ]; then
-    sed -i "s/%USER%/easywi_web/" /etc/nginx/sites-enabled/easywi.conf
-    sed -i "s/%SERVERNAME%/$SERVERNAME/" /etc/nginx/sites-enabled/easywi.conf
-    sed -i "s#%PHP_SOCKET%#$PHP_SOCKET#" /etc/nginx/sites-enabled/easywi.conf \
+    sed -i "s/%USER%/easywi_web/g" /etc/nginx/sites-enabled/easywi.conf
+    sed -i "s/%SERVERNAME%/$SERVERNAME/g" /etc/nginx/sites-enabled/easywi.conf
+    sed -i "s#%PHP_SOCKET%#$PHP_SOCKET#g" /etc/nginx/sites-enabled/easywi.conf
 
     sed -i "s/%GAMESERVERUPDATEHOURS%/$GAMESERVERUPDATEHOURS/g" /etc/cron.d/easywi
 
-    sed -i "s/%USER%/easywi_web/" /etc/php/$USE_PHP_VERSION/fpm/pool.d/easywi.conf
-    sed -i "s#%PHP_SOCKET%#$PHP_SOCKET#" /etc/php/$USE_PHP_VERSION/fpm/pool.d/easywi.conf
+    sed -i "s/%USER%/easywi_web/g" /etc/php/$USE_PHP_VERSION/fpm/pool.d/easywi.conf
+    sed -i "s#%PHP_SOCKET%#$PHP_SOCKET#g" /etc/php/$USE_PHP_VERSION/fpm/pool.d/easywi.conf
 
     nginx -c /etc/nginx/nginx.conf -t
 

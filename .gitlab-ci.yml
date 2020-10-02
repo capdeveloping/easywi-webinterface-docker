@@ -20,6 +20,6 @@ test build:
   stage: build
   script:
     - docker build -t "$CI_REGISTRY_IMAGE:test-0.1.$CI_PIPELINE_ID" .
-    - docker image rm "$CI_REGISTRY_IMAGE:test-0.1.$CI_PIPELINE_ID"
+    #- docker image rm "$CI_REGISTRY_IMAGE:test-0.1.$CI_PIPELINE_ID"
   except:
     - master
