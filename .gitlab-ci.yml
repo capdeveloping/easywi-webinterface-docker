@@ -9,8 +9,8 @@ push to docker hub:
   script:
     - docker build -t "$CI_REGISTRY_IMAGE:latest" -t "$CI_REGISTRY_IMAGE:0.1.$CI_PIPELINE_ID" .
     - docker push "$CI_REGISTRY_IMAGE"
-    - docker iamge rm "$CI_REGISTRY_IMAGE:latest"
-    - docker iamge rm "$CI_REGISTRY_IMAGE:0.1.$CI_PIPELINE_ID"
+    - docker image rm "$CI_REGISTRY_IMAGE:latest"
+    - docker image rm "$CI_REGISTRY_IMAGE:0.1.$CI_PIPELINE_ID"
   only:
     - master
 
@@ -20,6 +20,6 @@ test build:
   stage: build
   script:
     - docker build -t "$CI_REGISTRY_IMAGE:test-0.1.$CI_PIPELINE_ID" .
-    - docker iamge rm "$CI_REGISTRY_IMAGE:test-0.1.$CI_PIPELINE_ID"
+    - docker image rm "$CI_REGISTRY_IMAGE:test-0.1.$CI_PIPELINE_ID"
   except:
     - master

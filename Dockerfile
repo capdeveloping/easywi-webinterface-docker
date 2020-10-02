@@ -3,8 +3,9 @@ MAINTAINER Captain < capdeveloping95 at gmail dot com >
 
 ENV MASTERUSER easywi
 ENV PASSWORD password
-ENV HOME /home/$MASTERUSER
+ENV HOME_MASTERUSER /home/$MASTERUSER
 ENV INSTALLER_VERSION 2.5
+ENV GAMESERVERUPDATEHOURS "1-6"
 
 ENV SERVERNAME _
 ENV EMAIL example@example.com
@@ -26,37 +27,31 @@ RUN apt-get -y update \
 RUN useradd -m -b /home/ -s /bin/bash $MASTERUSER \
     && echo $MASTERUSER:$PASSWORD | chpasswd
 
-RUN mkdir $HOME/sites-enabled/ \
-    && mkdir $HOME/skel \
-    && mkdir $HOME/skel/htdocs \
-    && mkdir $HOME/skel/logs \
-    && mkdir $HOME/skel/sessions \
-    && mkdir $HOME/skel/tmp \
+RUN mkdir $HOME_MASTERUSER/sites-enabled/ \
+    && mkdir $HOME_MASTERUSER/skel \
+    && mkdir $HOME_MASTERUSER/skel/htdocs \
+    && mkdir $HOME_MASTERUSER/skel/logs \
+    && mkdir $HOME_MASTERUSER/skel/sessions \
+    && mkdir $HOME_MASTERUSER/skel/tmp \
     && chown -cR $MASTERUSER:$WEBGROUPNAME $HOME >/dev/null 2>&1
 
 RUN apt-get -y install php$USE_PHP_VERSION-common php$USE_PHP_VERSION-curl php$USE_PHP_VERSION-gd php${USE_PHP_VERSION}-mcrypt php$USE_PHP_VERSION-mysql php$USE_PHP_VERSION-cli php$USE_PHP_VERSION-xml php$USE_PHP_VERSION-mbstring php$USE_PHP_VERSION-zip php$USE_PHP_VERSION-fpm \
     && apt-get -y install nginx-full \
+    && rm /etc/php/7.0/fpm/pool.d/www.conf \
     && rm /etc/nginx/sites-enabled/default \
-    && rm /etc/nginx/sites-available/default \
-    && sed -i "s/include=\/etc\/php\/7.0\/fpm\/pool.d\/\*.conf/include=\/home\/$MASTERUSER\/fpm-pool.d\/\*.conf/g" /etc/php/7.0/fpm/php-fpm.conf \
-    && sed -i "\/etc\/nginx\/sites-enabled\/\*;/a \ \ \ \ \ \ \ \ include \/home\/$MASTERUSER\/sites-enabled\/\*;" /etc/nginx/nginx.conf \
     && echo "/bin/false" >> /etc/shells
 
-ADD ./modify_fpm.conf.sh /root/modify_fpm.conf.sh
-ADD ./install_easywi.sh /root/install_easywi.sh
-ADD ./easywi.conf /home/$MASTERUSER/sites-enabled/easywi.conf
+ADD ./easywi.conf /etc/nginx/sites-enabled/easywi.conf
+ADD ./fpm-easywi.conf /etc/php/$USE_PHP_VERSION/fpm/pool.d/easywi.conf
+ADD ./cronfile  /etc/cron.d/easywi
 ADD ./entrypoint.sh /etc/entrypoint.sh
 
+RUN useradd -md /home/easywi_web -g $WEBGROUPNAME -s /bin/bash -k /home/$MASTERUSER/skel/ easywi_web \
+    && find /home/easywi_web/ -type f -exec chmod 0640 {} \; \
+    && find /home/easywi_web/ -mindepth 1 -type d -exec chmod 0750 {} \; \
+    && chown -cR easywi_web:$WEBGROUPNAME /home/easywi_web >/dev/null 2>&1
+
 RUN chown -R $MASTERUSER:$WEBGROUPID /home/$MASTERUSER/ \
-    && sed -i "s/%SERVERNAME%/$SERVERNAME/" /home/$MASTERUSER/sites-enabled/easywi.conf \
-    && sed -i "s#%PHP_SOCKET%#$PHP_SOCKET#" /home/$MASTERUSER/sites-enabled/easywi.conf \
-    && chown $MASTERUSER:$WEBGROUPNAME /home/$MASTERUSER/sites-enabled/easywi.conf \
-    && bash /root/install_easywi.sh \
-    && bash /root/modify_fpm.conf.sh \
-    && service php${USE_PHP_VERSION}-fpm stop \
-    && service php${USE_PHP_VERSION}-fpm start \
-    && nginx -c /etc/nginx/nginx.conf -t \
-    && service nginx restart \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
