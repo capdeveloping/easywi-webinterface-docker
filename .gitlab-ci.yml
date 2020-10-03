@@ -1,23 +1,26 @@
 image: docker:latest
 
+stages:
+  - build-container
+  - push
+
 # This file is a template, and might need editing before it works on your project.
-push to docker hub:
-  # Official docker image.
-  stage: build
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+push to github repo:
+  stage: push
+  image: debian:stable-slim
   script:
-    - docker build -t "$CI_REGISTRY_IMAGE:latest" -t "$CI_REGISTRY_IMAGE:0.1.$CI_PIPELINE_ID" .
-    - docker push "$CI_REGISTRY_IMAGE"
-    - docker image rm "$CI_REGISTRY_IMAGE:latest"
-    - docker image rm "$CI_REGISTRY_IMAGE:0.1.$CI_PIPELINE_ID"
+    - apt update -y && apt install git -y
+    - export UPDATE_GIT_URL="git remote set-url public-repo $GITHUB_URL"
+    - export ADD_GIT_URL="git remote add public-repo $GITHUB_URL"
+    - if [ `git remote | grep public-repo` == "public-repo" ]; then $UPDATE_GIT_URL; else $ADD_GIT_URL; fi
+    - git push public-repo HEAD:master
   only:
     - master
 
 test build:
   # Official docker image.
   image: docker:latest
-  stage: build
+  stage: build-container
   script:
     - docker build -t "$CI_REGISTRY_IMAGE:test-0.1.$CI_PIPELINE_ID" .
     #- docker image rm "$CI_REGISTRY_IMAGE:test-0.1.$CI_PIPELINE_ID"
