@@ -11,13 +11,14 @@ services:
     command: mysqld --default-authentication-plugin=mysql_native_password --sql_mode="NO_ENGINE_SUBSTITUTION"
 
   easywi:
-    image: easywi-webpanel:latest
+    image: capdeveloping/easywi-webinterface:latest
     container_name: easywi
-	links:
+	  links:
       - db:db
     ports:
       - 80:80
     restart: unless-stopped
     volumes:
-      - "/path/to/host/folder/:/home/easywi_web/htdocs/"
+      - "/path/to/host/folder/config.php:/home/easywi_web/htdocs/stuff/config.php"
+      - "/path/to/host/folder/keyphrasefile.php:/home/easywi_web/htdocs/stuff/keyphrasefile.php"
 

@@ -50,11 +50,15 @@ RUN useradd -md /home/easywi_web -g $WEBGROUPNAME -s /bin/bash -k /home/$MASTERU
     && mv /home/easywi_web/sessions /home/easywi_web/session \
     && find /home/easywi_web/ -type f -exec chmod 0640 {} \; \
     && find /home/easywi_web/ -mindepth 1 -type d -exec chmod 0750 {} \; \
-    && chown -cR easywi_web:$WEBGROUPNAME /home/easywi_web >/dev/null 2>&1
+    && chown -cR easywi_web:$WEBGROUPNAME /home/easywi_web >/dev/null 2>&1 \
+    && chmod 644 /etc/cron.d/easywi
 
 RUN chown -R $MASTERUSER:$WEBGROUPID /home/$MASTERUSER/ \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
+
+RUN ls -la /etc/cron.d/easywi \
+    && cat /etc/cron.d/easywi
 
 EXPOSE 80
 
