@@ -13,7 +13,7 @@ services:
   easywi:
     image: capdeveloping/easywi-webinterface:latest
     container_name: easywi
-	  links:
+    links:
       - db:db
     ports:
       - 80:80
