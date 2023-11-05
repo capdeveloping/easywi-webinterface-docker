@@ -1,10 +1,10 @@
-FROM debian:stretch
+FROM debian:bullseye
 MAINTAINER Captain < capdeveloping95 at gmail dot com >
 
 ENV MASTERUSER easywi
 ENV PASSWORD password
 ENV HOME_MASTERUSER /home/$MASTERUSER
-ENV INSTALLER_VERSION 2.5
+ENV INSTALLER_VERSION 3.3
 ENV GAMESERVERUPDATEHOURS "1-6"
 
 ENV SERVERNAME _
@@ -15,7 +15,7 @@ ENV WEBGROUPTMPID 33
 ENV WEBGROUPPATH /var/www
 ENV WEBGROUPCOMMENT Webserver
 
-ENV USE_PHP_VERSION 7.0
+ENV USE_PHP_VERSION 7.4
 ENV PHP_SOCKET /var/run/php/php$USE_PHP_VERSION-fpm.sock
 
 RUN apt-get -y update \
@@ -35,9 +35,9 @@ RUN mkdir $HOME_MASTERUSER/sites-enabled/ \
     && mkdir $HOME_MASTERUSER/skel/tmp \
     && chown -cR $MASTERUSER:$WEBGROUPNAME $HOME >/dev/null 2>&1
 
-RUN apt-get -y install php$USE_PHP_VERSION-common php$USE_PHP_VERSION-curl php$USE_PHP_VERSION-gd php${USE_PHP_VERSION}-mcrypt php$USE_PHP_VERSION-mysql php$USE_PHP_VERSION-cli php$USE_PHP_VERSION-xml php$USE_PHP_VERSION-mbstring php$USE_PHP_VERSION-zip php$USE_PHP_VERSION-fpm \
+RUN apt-get -y install php$USE_PHP_VERSION-common php$USE_PHP_VERSION-curl php$USE_PHP_VERSION-gd php$USE_PHP_VERSION-mysql php$USE_PHP_VERSION-cli php$USE_PHP_VERSION-xml php$USE_PHP_VERSION-mbstring php$USE_PHP_VERSION-zip php$USE_PHP_VERSION-fpm \
     && apt-get -y install nginx-full \
-    && rm /etc/php/7.0/fpm/pool.d/www.conf \
+    && rm /etc/php/$USE_PHP_VERSION/fpm/pool.d/www.conf \
     && rm /etc/nginx/sites-enabled/default \
     && echo "/bin/false" >> /etc/shells
 

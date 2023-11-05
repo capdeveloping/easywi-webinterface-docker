@@ -28,8 +28,8 @@ if [ -z "$(find "home/easywi_web/htdocs/" -maxdepth 1 -type f -exec echo Found {
     chown -R easywi_web:$WEBGROUPNAME /home/easywi_web/
 fi
 
-service php7.0-fpm stop
-service php7.0-fpm start
+service php$USE_PHP_VERSION-fpm stop
+service php$USE_PHP_VERSION-fpm start
 
 service cron restart
 

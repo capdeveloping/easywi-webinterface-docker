@@ -8,12 +8,15 @@ services:
       - "/path/to/host/folder/:/var/lib/mysql"
     environment:
       - MYSQL_ROOT_PASSWORD=password
-    command: mysqld --default-authentication-plugin=mysql_native_password --sql_mode="NO_ENGINE_SUBSTITUTION"
+      - MYSQL_DATABASE=easywi
+      - MYSQL_USER=easywi
+      - MYSQL_PASSWORD=easywi-password
+    command: mysqld --default-authentication-plugin=caching_sha2_password
 
   easywi:
     image: capdeveloping/easywi-webinterface:latest
     container_name: easywi
-	  links:
+    links:
       - db:db
     ports:
       - 80:80
