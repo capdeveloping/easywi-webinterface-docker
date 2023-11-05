@@ -1,17 +1,18 @@
-image: docker:latest
+---
 
 stages:
   - build-container
   - pre-push
   - push
 
-before_script:
-  - export VERSION=$(grep -iE "installer_version" Dockerfile | cut -d " " -f3)
-  - export datestr=`date '+%Y%m%d'`
+.default:
+  image: docker:latest
+  before_script:
+    - export VERSION=$(grep -iE "installer_version" Dockerfile | cut -d " " -f3)
+    - export datestr=`date '+%Y%m%d'`
 
 test build:
-  # Official docker image.
-  image: docker:latest
+  extends: .default
   stage: build-container
   script:
     - docker build -t "$CI_REGISTRY_IMAGE:test-$VERSION.$datestr" .
@@ -22,6 +23,7 @@ test build:
 push to github repo:
   stage: push
   image: debian:stable-slim
+  extends: .default
   rules:
     - if: $AUTO_BUILD == "false" && $CI_COMMIT_BRANCH == "master"
   script:
@@ -34,6 +36,7 @@ push to github repo:
 clean up docker test images:
   # Official docker image.
   stage: pre-push
+  extends: .default
   script:
     - docker image rm "$CI_REGISTRY_IMAGE:test-$VERSION" &> /dev/null || true
   only:
@@ -43,6 +46,7 @@ push to docker hub:
   # Official docker image.
   stage: push
   before_script:
+    - !reference [.default, before_script]
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
     - docker build . -t "$CI_REGISTRY_IMAGE:latest" -t "$CI_REGISTRY_IMAGE:$VERSION.$datestr"
